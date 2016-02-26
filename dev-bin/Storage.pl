@@ -6,13 +6,15 @@ use WWW::TinyURLer::Storage;
 
 my $name = time;
 my $config = {
-    storage => {
-        engine => 'DBI',
-        dsn => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
-        username => '',
-        password => '',
-        deploy => 1
-    }
+    engine => 'DBI',
+    engines => {
+        DBI => {
+            dsn => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
+            username => '',
+            password => '',
+            deploy => 1,
+        },
+    },
 };
 
 my $storage = WWW::TinyURLer::Storage->new_from_config($config);

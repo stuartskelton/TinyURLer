@@ -4,17 +4,27 @@ use strict;
 use warnings;
 use Class::Load 'load_class';
 
+sub new {
+    my $class = shift;
+    my $object = shift;
+    return bless $object, $class;
+}
+
 sub new_from_config {
     my $class = shift;
     my $config = shift;
     
-    die "You can only have a single type of storage"
-        unless ($config->{storage}->{engine});
+    die "You must specify a config for a storage engine"
+        unless ($config);
     
-    my $loader_class = __PACKAGE__ . '::' . $config->{storage}->{engine};
+    my $engine_class = __PACKAGE__ . '::' . $config->{engine};
+    load_class($engine_class);
+    my $engine_config = $config->{engines}->{$config->{engine}};
+    my $engine = $engine_class->new_from_config($engine_config);
     
-    load_class($loader_class);
-    return $loader_class->new($config->{storage});
+    my $object = { engine => $engine };
+    my $storage = $class->new( $object );
+    return $storage;
 }
 
 =head2

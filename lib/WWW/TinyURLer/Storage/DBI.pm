@@ -6,29 +6,46 @@ use warnings;
 use DBI;
 use base 'WWW::TinyURLer::Storage';
 
-
 sub new {
     my $class = shift;
-    my $config = shift;
-
-    die "You need some connection details" unless ($config->{dsn});
-    return bless $config,$class;
+    my $object = shift;
+    return bless $object, $class;
 }
+
+sub new_from_config {
+    my $class = shift;
+    my $config = shift;
+    
+    die "You need some connection details" unless ($config);
+    my $dbh = $class->_connect_dbh($config);
+
+    my $object = { dbh => $dbh };
+    my $engine = $class->new($object);
+    
+    if ($config->{deploy}) {
+        $engine->_deploy;
+        $engine->{deploy} = 0;
+    };
+    
+    return $engine;
+}
+
+sub _connect_dbh {
+    my $class = shift;
+    my $config = shift;
+    
+    my $dbh = DBI->connect(
+        $config->{dsn},
+        $config->{username} // '',
+        $config->{password} // ''
+    );
+    return $dbh;
+}
+
 
 #
 # Attributes
 #
-
-sub dbh {
-    my $self = shift;
-    $self->{dbh} = DBI->connect(
-        $self->{dsn},
-        $self->{username} // '',
-        $self->{password} // ''
-        ) unless $self->{dbh};
-    $self->_depoly if $self->{deploy};
-    return $self->{dbh};
-}
 
 
 
@@ -37,7 +54,7 @@ sub dbh {
 #
 
 
-sub _depoly {
+sub _deploy {
     my $self = shift;
     my $dbh = $self->{dbh};
     my $drop_table = "DROP TABLE IF EXISTS tinyurler";
@@ -46,11 +63,10 @@ sub _depoly {
             CREATE TABLE 'tinyurler' (
             'short_url' TEXT,
             'long_url'  TEXT,
-            'expires_on'    TEXT,
+            'expires_at'    TEXT,
             PRIMARY KEY(short_url)
             )";
     $dbh->do($table_create_sql) or die $dbh->errstr;
-    $self->{deploy} = 0;
     return 1;
 }
 
@@ -58,7 +74,7 @@ sub create {
     my ($self,@args) = @_;
     die 'You need three arguments to create a record' unless 3 == scalar @args;
     my $insert_sql = sprintf(
-        "INSERT INTO tinyurler ('short_url','long_url','expires_on') VALUES ('%s','%s','%s')",
+        "INSERT INTO tinyurler ('short_url','long_url','expires_at') VALUES ('%s','%s','%s')",
         @args );
     $self->dbh->do($insert_sql) or die $self->dbh->errstr;
     return 1;
@@ -96,7 +112,7 @@ sub expire {
     my ($self,$short_url) = @_;
     die unless $short_url;
     my $expire_sql = sprintf(
-        "UPDATE tinyurler SET expires_on='%s' WHERE short_url='%s'",
+        "UPDATE tinyurler SET expires_at='%s' WHERE short_url='%s'",
         'FOO', $short_url );
     $self->dbh->do($expire_sql) or die $self->dbh->errstr;
     return 1;
