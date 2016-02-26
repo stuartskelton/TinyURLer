@@ -47,8 +47,21 @@ A hashref of the row data to be inserted in the table
 
 =cut
 
-sub create {
-    return [ 201, [ Location => 'http://testserver.com' ], [] ]
+sub generate_and_store {
+    my $self = shift;
+    my $generator = shift;
+    my $data = shift;
+    
+    my $silly_demo_path = "/my/path/";
+    
+    my $tries = 0;
+    my $new_url;
+    do {
+        $tries++;
+        $new_url = \$generator($silly_demo_path);
+    } while ( $self->{engine}->find($new_url) );
+    $self->{engine}->insert($new_url, $data->{destination_url}, 12345678);
+    return $new_url;
 }
 
 =head2 find
@@ -61,8 +74,10 @@ if a row is found then return the row, if not return undef.
 
 =cut
 
-sub redirect {
-    return [ 307, [ Location => 'http://testserver.com' ], [] ]
+sub find_redirect {
+    my $self = shift;
+    my $requested = shift;
+    return $self->{engine}->find($requested)
 }
 
 
@@ -75,7 +90,7 @@ $self->update(short_url,$long_url)
 =cut
 
 sub update {
-    return [ 200, [], [] ]
+    ...
 }
 
 =head2
@@ -86,11 +101,8 @@ $self->expire(short_url)
 
 =cut
 
-sub expire {
-    return [ 202, [], [ "Goodbye"] ]
+sub expire_now {
+    ...
 }
 
-sub bad_method {
-    return [ 405, [], [] ];
-}
 1;
