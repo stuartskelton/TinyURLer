@@ -28,12 +28,7 @@ for (0..100) {
 # do some finds
 for (0..100) {
     next unless 0 == $_ % 7;
-    $storage->find("url$_");
-}
-
-for (0..100) {
-    my $url =  0 == $_ % 7 ? "NEWURL$_" : "url$_";
-    p $storage->find_and_create($url,"LONG$_",'moo');
+    $storage->redirect("url$_");
 }
 
 #  do some updates

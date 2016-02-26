@@ -27,19 +27,31 @@ sub new_from_config {
     return $storage;
 }
 
-=head2
+=head2 create
 
-this should create a table in the storage
+Create a new entry in the table and return the short URL on succes.
 
-$self->create(short_url,$long_url,expires_on)
+    $storage->create($generator, $row_hash_ref)
+
+=over
+
+=item $generator
+
+A Coderef that will generate a (random) string.
+
+=item $row_hash_ref
+
+A hashref of the row data to be inserted in the table
+
+=back
 
 =cut
 
 sub create {
-    ...
+    return [ 201, [ Location => 'http://testserver.com' ], [] ]
 }
 
-=head2
+=head2 find
 
 this should find a given record within the storage
 
@@ -49,23 +61,10 @@ if a row is found then return the row, if not return undef.
 
 =cut
 
-sub find {
-    ...
+sub redirect {
+    return [ 307, [ Location => 'http://testserver.com' ], [] ]
 }
 
-=head2
-
-this should combine both the find and create, if you find it return the record
-if not create and return that instead
-
-$self->find_and_create(short_url,$long_url,expires_on)
-
-
-=cut
-
-sub find_and_create {
-    ...
-}
 
 =head2
 
@@ -76,7 +75,7 @@ $self->update(short_url,$long_url)
 =cut
 
 sub update {
-    ...
+    return [ 200, [], [] ]
 }
 
 =head2
@@ -88,7 +87,10 @@ $self->expire(short_url)
 =cut
 
 sub expire {
-    ...
+    return [ 202, [], [ "Goodbye"] ]
 }
 
+sub bad_method {
+    return [ 405, [], [] ];
+}
 1;
