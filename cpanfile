@@ -1,4 +1,4 @@
-requires 'Class::Load;
+requires 'Class::Load';
 requires 'DBD::SQLite';
 requires 'DBI';
 requires 'DDP';
