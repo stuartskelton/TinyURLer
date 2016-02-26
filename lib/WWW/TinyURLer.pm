@@ -24,7 +24,19 @@ my $config = {
                 deploy   => 1,
             }
         }
+    },
+    generate => {
+        default => 'base36',
+        generators => {
+            base36 => {
+                length => 7,
+            },
+#             uuid => {},
+#             languages => {},
+        }
     }
+    time_to_life => 48 * 3600,
+    publichost => 'localhost',
 };
 
 my $storage = WWW::TinyURLer::Storage->new_from_config($config->{storage});
