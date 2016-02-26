@@ -3,7 +3,7 @@ package WWW::TinyURLer;
 use strict;
 use warnings;
 
-#use WWW::TinyURLer::Storage;
+use WWW::TinyURLer::Storage;
 
 my $methods = {
     GET     => \&_redirect,
@@ -11,6 +11,23 @@ my $methods = {
     PUT     => \&_update,
     DELETE  => \&_expire,
 };
+
+my $name = time;
+my $config = {
+    storage => {
+        engine  => 'DBI',
+        engines => {
+            DBI => {
+                dsn      => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
+                username => '',
+                password => '',
+                deploy   => 1,
+            }
+        }
+    }
+};
+
+my $storage = WWW::TinyURLer::Storage->new_from_config($config->{storage});
 
 sub dispatch {
 use DDP; p @_;
