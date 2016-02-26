@@ -18,21 +18,39 @@ my $config = {
         engine  => 'DBI',
         engines => {
             DBI => {
-                dsn      => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
-                username => '',
-                password => '',
-                deploy   => 1,
+                dsn             => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
+                username        => '',
+                password        => '',
+                deploy          => 1,
             }
         }
     },
     generate => {
-        default => 'base36',
+        default => 'string',
+        retry_error     => 10,
         generators => {
-            base36 => {
-                length => 7,
+            string => {
+                chars           => '123456789bcdfghjkmnpqrstvwxz', # will be lower cased
+                length          => 7, # default
+                retry_warning   => 3,
             },
-#             uuid => {},
-#             languages => {},
+#           uuid => {},
+#           words => {
+#               default => 'coding',
+#               dictionaries => {
+#                   en => [
+#                       ['two', 'three', 'four', 'five'],
+#                       ['red', 'blue', 'green', 'white', 'black'],
+#                       ['cars', 'trees', 'balls', 'dogs', 'cats']
+#                   ],
+#                   nl => [
+#                       ['rode', 'blauwe', 'groene', 'witte', 'zwarte'],
+#                       ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+#                   ],
+#                   coding => [
+#                       ['foo', 'bar', 'baz', 'qux'],['foo', 'bar', 'baz', 'qux'],['foo', 'bar', 'baz', 'qux']
+#                   ]
+#           },
         }
     }
     time_to_life => 48 * 3600,
