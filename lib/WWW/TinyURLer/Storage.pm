@@ -58,7 +58,7 @@ sub generate_and_store {
     my $new_url;
     do {
         $tries++;
-        $new_url = \$generator($silly_demo_path);
+        $new_url = $generator->({path => $silly_demo_path});
     } while ( $self->{engine}->find($new_url) );
     $self->{engine}->insert($new_url, $data->{destination_url}, 12345678);
     return $new_url;

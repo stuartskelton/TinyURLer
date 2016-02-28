@@ -2,7 +2,7 @@ package WWW::TinyURLer;
 
 use strict;
 use warnings;
-
+use WWW::TinyURLer::Generators;
 use WWW::TinyURLer::Storage;
 
 my $methods = {
@@ -18,7 +18,7 @@ my $config = {
         engine  => 'DBI',
         engines => {
             DBI => {
-                dsn             => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
+                dsn             => "dbi:SQLite:dbname=/Users/sskelton/dev/TinyURLer/${name}_1.sqlite",
                 username        => '',
                 password        => '',
                 deploy          => 1,
@@ -34,7 +34,7 @@ my $config = {
                 length          => 7, # default
                 retry_warning   => 3,
             },
-#           uuid => {},
+            # uuid => {},
 #           words => {
 #               default => 'coding',
 #               dictionaries => {
@@ -58,7 +58,7 @@ my $config = {
 };
 
 my $storage = WWW::TinyURLer::Storage->new_from_config($config->{storage});
-my $generator = sub { return $_[0] . (int(6 * rand) +1) };
+my $generators = WWW::TinyURLer::Generators->new_from_config($config->{generate});
 
 sub dispatch {
     my $env = shift;
@@ -71,17 +71,18 @@ sub dispatch {
 sub _create {
     my $env = shift;
     my $destination = "http://my_super_long_URL";
+    my $generator = $generators->generate_key_sub;
+    my $new_url = $storage->generate_and_store(
+        $generator => { destination_url => $destination }
+    );
     
-    my $new_url = $storage->generate_and_store($generator => { destination_url => $destination });
-    
-    my $host = $config->{publichost} || $env{HTTP_HOST}
+    my $host = $config->{publichost} || $env->{HTTP_HOST};
     return [ 201, [ Location => $host . $new_url ], [] ]
 };
 
 sub _redirect {
     my $env = shift;
     my $requested = $env->{PATH_INFO};
-    
     if ( my $result = $storage->find_redirect($requested) ) {
         return [ 307, [ Location => $result->{destination_url} ], [] ]
     };
