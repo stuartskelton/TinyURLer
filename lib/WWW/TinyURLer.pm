@@ -18,7 +18,7 @@ my $config = {
         engine  => 'DBI',
         engines => {
             DBI => {
-                dsn             => "dbi:SQLite:dbname=/Users/sskelton/dev/TinyURLer/${name}_1.sqlite",
+                dsn             => "dbi:SQLite:dbname=/TinyURLer/${name}_1.sqlite",
                 username        => '',
                 password        => '',
                 deploy          => 1,
