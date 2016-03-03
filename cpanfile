@@ -1,5 +1,5 @@
 requires 'Class::Load';
-reauires 'Data::UUID';
+requires 'Data::UUID';
 requires 'DBD::SQLite';
 requires 'DBI';
 requires 'DDP';
