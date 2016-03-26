@@ -29,12 +29,20 @@ sub generate_key_sub {
 
 sub generate_key {
     my ($self,$args) = @_;
+
     # self calls to this the length will not be undef
     $args->{length} = $self->{length} unless $args->{length};
+
+    # select a random letter from the char_set
     my $letter = $self->{char_set}->[int rand $self->{char_set_length}];
+
+    # return if the last letter if the length is 0
     return $letter if 0 == --$args->{length};
+
     # protect against minus numbers
     die 'String length should not be a minus number' if 0 > $args->{length};
+
+    # turn the letter and calls itself as there is still letters to go.
     return $letter . $self->generate_key($args);
 }
 
