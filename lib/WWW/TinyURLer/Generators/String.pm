@@ -31,10 +31,10 @@ sub generate_key {
     my ($self,$args) = @_;
     # self calls to this the length will not be undef
     $args->{length} = $self->{length} unless $args->{length};
-    return '' if 0 == --$args->{length};
+    my $letter = $self->{char_set}->[int rand $self->{char_set_length}];
+    return $letter if 0 == --$args->{length};
     # protect against minus numbers
     die 'String length should not be a minus number' if 0 > $args->{length};
-    my $letter = $self->{char_set}->[int rand $self->{char_set_length}];
     return $letter . $self->generate_key($args);
 }
 
