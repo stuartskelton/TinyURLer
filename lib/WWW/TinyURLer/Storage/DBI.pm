@@ -39,6 +39,7 @@ sub _connect_dbh {
         $config->{username} // '',
         $config->{password} // ''
     );
+    $dbh->do("PRAGMA default_synchronous = OFF");
     return $dbh;
 }
 
